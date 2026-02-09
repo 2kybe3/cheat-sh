@@ -19,7 +19,7 @@ A tiny wrapper for [cheat.sh](https://cheat.sh/)
 
 ## Examples
 
-### Simple usage
+### Simple nix usage
 ```bashbash
 nix run github:2kybe3/nix-dotfiles\?dir=tools/cheat-sh
 ```
