@@ -14,6 +14,7 @@ A tiny wrapper for [cheat.sh](https://cheat.sh/)
 | -------- | ------ | ----------- |
 | `CHEAT_SHEAT_DEBUG`  | `true` / `false` | Enables debug output |
 | `CHEAT_SHEAT_VIEWER` | `less`, `bat`, `...` | Pager used to display results |
+| `CHEAT_SHEAT_REFRESH` | `true` / `false` | Clears the local cache before execution |
 
 ---
 

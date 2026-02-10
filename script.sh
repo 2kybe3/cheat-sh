@@ -4,8 +4,14 @@ export LC_ALL=C
 
 DEBUG=${CHEAT_SHEAT_DEBUG:-false}
 VIEWER="${CHEAT_SHEAT_VIEWER:-less}"
+FORCE_REFRESH=${CHEAT_SHEAT_REFRESH:-false}
 
 CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/cheatsh"
+
+if [[ "$FORCE_REFRESH" == "true" ]]; then
+    rm -rf "$CACHE_DIR"
+fi
+
 mkdir -p "$CACHE_DIR"
 
 b64safe() {
