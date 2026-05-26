@@ -2,46 +2,50 @@
   description = "Wrapper for ch.sh";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+
     flake-utils.url = "github:numtide/flake-utils";
+
+    home-manager = {
+      url = "github:nix-community/home-manager/master";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = {
-    self,
-    nixpkgs,
-    flake-utils,
-  }:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+      home-manager,
+    }:
     flake-utils.lib.eachDefaultSystem (
-      system: let
-        pkgs = import nixpkgs {inherit system;};
-        name = "cheat-sh";
-        deps = [
-          pkgs.fzf
-          pkgs.curl
-          pkgs.less
-          pkgs.coreutils
-        ];
-      in {
-        packages.default = pkgs.stdenv.mkDerivation {
-          pname = name;
-          version = "1.0.0";
-          src = ./.;
+      system:
+      let
+        pkgs = nixpkgs.legacyPackages.${system};
 
-          nativeBuildInputs = [pkgs.makeWrapper];
-          buildInputs = deps;
+        cheat-sh = pkgs.callPackage ./nix/cheat-sh.nix { };
+        homeManagerModule = pkgs.callPackage ./nix/modules/home-manager.nix { };
+        nixosModule = pkgs.callPackage ./nix/modules/nixos.nix { };
 
-          installPhase = ''
-            mkdir -p $out/bin
-            install -m755 ${./script.sh} $out/bin/${name}
-
-            wrapProgram $out/bin/${name} --prefix PATH : "${pkgs.lib.makeBinPath deps}"
-          '';
+        nixosTest = pkgs.callPackage ./nix/tests/nixos.nix { };
+        homeManagerTest = pkgs.callPackage ./nix/tests/home-manager.nix { inherit home-manager; };
+      in
+      {
+        packages = {
+          inherit cheat-sh;
+          default = cheat-sh;
         };
 
-        apps.default = {
-          type = "app";
-          program = "${self.packages.${system}.default}/bin/${name}";
+        homeManagerModule.default = homeManagerModule;
+
+        nixosModules.default = nixosModule;
+      }
+      // {
+        checks = {
+          inherit cheat-sh nixosTest homeManagerTest;
         };
+
       }
     );
 }
