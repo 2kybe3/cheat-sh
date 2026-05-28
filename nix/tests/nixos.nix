@@ -19,7 +19,6 @@ testers.nixosTest {
 
   testScript = ''
     machine.wait_for_unit("multi-user.target")
-
-    machine.succeed("command -v cheat-sh || true")
+    machine.succeed("command -v cheat-sh")
   '';
 }

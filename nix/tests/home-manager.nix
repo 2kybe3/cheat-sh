@@ -30,9 +30,8 @@ testers.nixosTest {
     };
   testScript = ''
     machine.wait_for_unit("multi-user.target")
-
+    machine.wait_for_unit("home-manager-kybe.target")
     machine.succeed("su - test -c 'true'")
-
-    machine.succeed("command -v cheat-sh || true")
+    machine.succeed("command -v cheat-sh")
   '';
 }
