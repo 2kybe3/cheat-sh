@@ -25,11 +25,14 @@
         pkgs = nixpkgs.legacyPackages.${system};
 
         cheat-sh = pkgs.callPackage ./nix/cheat-sh.nix { };
-        homeManagerModule = pkgs.callPackage ./nix/modules/home-manager.nix { };
-        nixosModule = pkgs.callPackage ./nix/modules/nixos.nix { };
 
-        nixosTest = pkgs.callPackage ./nix/tests/nixos.nix { };
-        homeManagerTest = pkgs.callPackage ./nix/tests/home-manager.nix { inherit home-manager; };
+        homeManagerModule = import ./nix/modules/home-manager.nix;
+        nixosModule = import ./nix/modules/nixos.nix;
+
+        nixosTest = pkgs.callPackage ./nix/tests/nixos.nix { inherit nixosModule; };
+        homeManagerTest = pkgs.callPackage ./nix/tests/home-manager.nix {
+          inherit home-manager homeManagerModule;
+        };
       in
       {
         packages = {
@@ -37,9 +40,15 @@
           default = cheat-sh;
         };
 
-        homeManagerModule.default = homeManagerModule;
+        homeManagerModules = {
+          default = homeManagerModule;
+          cheat-sh = homeManagerModule;
+        };
 
-        nixosModules.default = nixosModule;
+        nixosModules = {
+          default = nixosModule;
+          cheat-sh = nixosModule;
+        };
       }
       // {
         checks = {

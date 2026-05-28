@@ -1,14 +1,15 @@
 {
-  pkgs,
+  testers,
+  nixosModule,
   ...
 }:
-pkgs.testers.nixosTest {
+testers.nixosTest {
   name = "nixos-module-check";
 
   nodes.machine =
     { ... }:
     {
-      imports = [ ../modules/nixos.nix ];
+      imports = [ nixosModule ];
 
       programs.cheat-sh = {
         enable = true;
@@ -18,5 +19,7 @@ pkgs.testers.nixosTest {
 
   testScript = ''
     machine.wait_for_unit("multi-user.target")
+
+    machine.succeed("command -v cheat-sh || true")
   '';
 }

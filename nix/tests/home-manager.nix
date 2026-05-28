@@ -1,9 +1,10 @@
 {
-  pkgs,
+  testers,
   home-manager,
+  homeManagerModule,
   ...
 }:
-pkgs.testers.nixosTest {
+testers.nixosTest {
   name = "nixos-module-check";
   nodes.machine =
     { ... }:
@@ -16,7 +17,7 @@ pkgs.testers.nixosTest {
         { ... }:
         {
           imports = [
-            ../modules/home-manager.nix
+            homeManagerModule
           ];
 
           programs.cheat-sh = {
@@ -29,5 +30,9 @@ pkgs.testers.nixosTest {
     };
   testScript = ''
     machine.wait_for_unit("multi-user.target")
+
+    machine.succeed("su - test -c 'true'")
+
+    machine.succeed("command -v cheat-sh || true")
   '';
 }

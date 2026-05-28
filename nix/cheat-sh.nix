@@ -1,8 +1,11 @@
 {
-  pkgs ? import <nixpkgs> { },
+  fzf,
+  curl,
+  less,
+  writeShellApplication,
   ...
 }:
-pkgs.writeShellApplication {
+writeShellApplication {
   name = "cheat-sh";
 
   derivationArgs = {
@@ -10,7 +13,7 @@ pkgs.writeShellApplication {
     strictDeps = true;
   };
 
-  runtimeInputs = with pkgs; [
+  runtimeInputs = [
     fzf
     curl
     less
