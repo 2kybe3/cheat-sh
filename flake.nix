@@ -19,15 +19,16 @@
       flake-utils,
       home-manager,
     }:
+    let
+      homeManagerModule = import ./nix/modules/home-manager.nix;
+      nixosModule = import ./nix/modules/nixos.nix;
+    in
     flake-utils.lib.eachDefaultSystem (
       system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
 
         cheat-sh = pkgs.callPackage ./nix/cheat-sh.nix { };
-
-        homeManagerModule = import ./nix/modules/home-manager.nix;
-        nixosModule = import ./nix/modules/nixos.nix;
 
         nixosTest = pkgs.callPackage ./nix/tests/nixos.nix { inherit nixosModule; };
         homeManagerTest = pkgs.callPackage ./nix/tests/home-manager.nix {
@@ -40,21 +41,21 @@
           default = cheat-sh;
         };
 
-        homeManagerModules = {
-          default = homeManagerModule;
-          cheat-sh = homeManagerModule;
-        };
-
-        nixosModules = {
-          default = nixosModule;
-          cheat-sh = nixosModule;
-        };
-      }
-      // {
         checks = {
           inherit cheat-sh nixosTest homeManagerTest;
         };
-
       }
-    );
+    )
+    // {
+
+      homeManagerModules = {
+        default = homeManagerModule;
+        cheat-sh = homeManagerModule;
+      };
+
+      nixosModules = {
+        default = nixosModule;
+        cheat-sh = nixosModule;
+      };
+    };
 }
